@@ -75,6 +75,17 @@ ignore = [
 # (_pending, _stack) on purpose, to pin behaviour that has no other handle.
 "tests/*" = ["S105", "S106", "SLF001"]
 
+# These probe whether an optional dependency is installed and keep only the
+# result in a _FLAG. The import name itself is deliberately unused — that is
+# the idiom, and ruff's suggested importlib.util.find_spec rewrite would be a
+# behaviour change (it would no longer import the module, which some of these
+# packages need in order to be importable at all).
+"actions/open_app.py"      = ["F401"]
+"actions/youtube_video.py" = ["F401"]
+
+# The same probe pattern, checking that pywin32 registered correctly.
+"setup.py" = ["F401"]
+
 [tool.ruff.lint.isort]
 known-first-party = ["core", "memory", "actions", "plugins", "dashboard", "config"]
 

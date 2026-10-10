@@ -9,7 +9,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-from config import get_os, is_linux, is_mac, is_windows
+from config import is_linux, is_mac, is_windows
 
 _CNW: dict = (
     {"creationflags": subprocess.CREATE_NO_WINDOW}

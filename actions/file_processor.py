@@ -17,12 +17,10 @@ Supported types:
 """
 
 import json
-import os
 import re
 import shutil
 import subprocess
 import tempfile
-from datetime import datetime
 from pathlib import Path
 
 # Model choice, timeout and fallback ladder all live in core/gemini.py.

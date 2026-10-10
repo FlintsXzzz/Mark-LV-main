@@ -1,6 +1,5 @@
 # config/__init__.py
 import json
-import os
 import platform
 from pathlib import Path
 

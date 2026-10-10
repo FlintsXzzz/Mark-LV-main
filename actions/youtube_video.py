@@ -1,10 +1,8 @@
 #youtube_video.py
 import json
 import re
-import shutil
 import subprocess
 import sys
-import time
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import quote_plus
@@ -33,7 +31,7 @@ try:
 except ImportError:
     _TRANSCRIPT_OK = False
 
-from config import get_os, is_linux, is_mac, is_windows
+from config import is_linux, is_mac, is_windows
 
 
 def _get_base_dir() -> Path:

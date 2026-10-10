@@ -286,16 +286,20 @@ python main.py
 
 ---
 
-## 🧪 Tests
+## 🧪 Tests & Linting
 
 The logic that needs no microphone, camera or GPU has a test suite — the confirmation gate, the undo stack, the viseme mapper, settings persistence and the action loader.
 
 ```bash
-pip install pytest
-python -m pytest tests -q
+pip install pytest ruff
+python -m pytest          # or: pytest
+ruff check .              # lint
+ruff check . --fix        # lint and apply safe fixes
 ```
 
-Runs headless in about two seconds and never touches `config/api_keys.json` or any real device. The modules that do need hardware or the network (`main.py`, `ui.py`, `dashboard/`) are not covered.
+Tests run headless in about a second and never touch `config/api_keys.json` or any real device. The modules that do need hardware or the network (`main.py`, `ui.py`, `dashboard/`) are not covered by tests.
+
+Lint configuration lives in `pyproject.toml`. Every rule that is switched off is off for a recorded reason — the blind-except and `subprocess` patterns are how the assistant stays resilient while driving the OS, `open_app` launching apps by name is its whole purpose, and the `_FLAG` import probes deliberately import a package only to find out whether it is installed. Read the comments there before re-enabling one.
 
 ---
 

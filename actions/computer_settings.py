@@ -98,7 +98,6 @@ def volume_get() -> int | None:
     undoable — a wrong undo is worse than no undo."""
     try:
         if _OS == "Windows":
-            import math
             from ctypes import POINTER, cast
 
             from comtypes import CLSCTX_ALL

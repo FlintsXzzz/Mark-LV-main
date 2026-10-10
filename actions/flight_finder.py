@@ -6,7 +6,7 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from config import is_linux, is_mac, is_windows
+from config import is_mac, is_windows
 
 
 def _get_base_dir() -> Path:
@@ -150,7 +150,6 @@ def _parse_flights_with_gemini(
     destination: str,
     date:        str,
 ) -> list[dict]:
-    from google import genai as _genai
     from google.genai import types
 
     prompt  = (
