@@ -20,9 +20,9 @@ from pathlib import Path
 
 _DEPS_OK = False
 try:
-    from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
-    from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
     import uvicorn
+    from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+    from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
     _DEPS_OK = True
 except ImportError:
     pass
@@ -30,7 +30,8 @@ except ImportError:
 # python-multipart is required for file uploads — optional dependency
 _UPLOAD_OK = False
 try:
-    from fastapi import UploadFile, File as FastAPIFile
+    from fastapi import File as FastAPIFile
+    from fastapi import UploadFile
     _UPLOAD_OK = True
 except Exception:
     pass
@@ -61,7 +62,7 @@ UPLOADS_DIR = _make_uploads_dir()
 def _get_gemini_key() -> str | None:
     try:
         import json as _json
-        with open(BASE_DIR / "config" / "api_keys.json", "r", encoding="utf-8") as f:
+        with open(BASE_DIR / "config" / "api_keys.json", encoding="utf-8") as f:
             return _json.load(f).get("gemini_api_key")
     except Exception:
         return None
@@ -80,8 +81,8 @@ def _derive_key(session_key: str) -> bytes:
 
 def _decrypt_cbc(aes_key: bytes, enc_b64: str) -> str:
     """Decrypt base64(IV[16] ‖ ciphertext) with AES-256-CBC + PKCS7."""
-    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
     from cryptography.hazmat.primitives import padding as sym_pad
+    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
     raw      = base64.b64decode(enc_b64)
     iv, ct   = raw[:16], raw[16:]
     dec      = Cipher(algorithms.AES(aes_key), modes.CBC(iv)).decryptor()
@@ -106,11 +107,16 @@ def _ensure_network_access(port: int) -> None:
     macOS   : osascript admin dialog if the Application Firewall is on.
     Linux   : pkexec GUI → sudo -n → prints manual command as fallback.
     """
-    import sys, subprocess, os, tempfile, threading
+    import os
+    import subprocess
+    import sys
+    import tempfile
+    import threading
 
     # ── Windows ──────────────────────────────────────────────────────────────
     if sys.platform == "win32":
-        import ctypes, time
+        import ctypes
+        import time
 
         port_rule = f"JARVIS Dashboard Port {port}"
         prog_rule  = "JARVIS Dashboard Python"
@@ -317,7 +323,7 @@ def _ensure_crypto_js() -> None:
         print("[Dashboard] CryptoJS cached — will serve locally from now on.")
     except Exception as e:
         print(f"[Dashboard] CryptoJS download failed: {e}")
-        print(f"[Dashboard] Encryption will fall back to CDN load on client.")
+        print("[Dashboard] Encryption will fall back to CDN load on client.")
 
 
 _ensure_crypto_js()
@@ -382,6 +388,7 @@ def _ensure_certs() -> bool:
     try:
         import datetime
         import ipaddress
+
         from cryptography import x509
         from cryptography.hazmat.primitives import hashes, serialization
         from cryptography.hazmat.primitives.asymmetric import rsa
@@ -413,7 +420,7 @@ def _ensure_certs() -> bool:
 
         # Timezone-aware UTC: datetime.utcnow() is deprecated from Python 3.12 on,
         # and the builder normalises aware values to UTC itself.
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = datetime.datetime.now(datetime.UTC)
         cert = (
             x509.CertificateBuilder()
             .subject_name(who)

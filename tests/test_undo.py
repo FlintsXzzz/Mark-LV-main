@@ -10,7 +10,13 @@ import pytest
 
 from core import undo as undo_mod
 from core.undo import (
-    MAX_DEPTH, can_undo, clear, history, peek, push_undo, undo_last,
+    MAX_DEPTH,
+    can_undo,
+    clear,
+    history,
+    peek,
+    push_undo,
+    undo_last,
 )
 
 

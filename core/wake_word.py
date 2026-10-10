@@ -21,8 +21,8 @@ import queue
 import subprocess
 import sys
 import threading
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable
 
 # Pretrained openwakeword model that listens for "Hey Jarvis".
 WAKE_MODEL = "hey_jarvis"

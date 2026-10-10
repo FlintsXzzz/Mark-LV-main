@@ -5,6 +5,7 @@ Whisper  – offline transcription via faster-whisper (VAD-buffered)
 Vosk     – offline streaming transcription (lighter)
 """
 import json
+
 import numpy as np
 
 
@@ -13,6 +14,7 @@ class WhisperSTT:
 
     def __init__(self, model_name: str = "base", language: str | None = None):
         import os
+
         from faster_whisper import WhisperModel
         print(f"[STT] Loading Whisper '{model_name}'…")
         try:
@@ -74,7 +76,7 @@ class VoskSTT:
     """Streaming transcription using Vosk."""
 
     def __init__(self, model_path: str | None = None, language: str = "en-us"):
-        from vosk import Model, KaldiRecognizer
+        from vosk import KaldiRecognizer, Model
         print("[STT] Loading Vosk model…")
         if model_path:
             model = Model(model_path)

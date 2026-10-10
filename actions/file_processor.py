@@ -16,21 +16,22 @@ Supported types:
   pptx    → summarize, extract_text, to_pdf
 """
 
+import json
 import os
 import re
-import json
 import shutil
 import subprocess
 import tempfile
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 # Model choice, timeout and fallback ladder all live in core/gemini.py.
 from core import gemini
 
+
 def _get_api_key() -> str:
     config_path = Path(__file__).resolve().parent.parent / "config" / "api_keys.json"
-    with open(config_path, "r", encoding="utf-8") as f:
+    with open(config_path, encoding="utf-8") as f:
         return json.load(f)["gemini_api_key"]
 
 
@@ -636,7 +637,7 @@ def _process_video(path: Path, action: str, params: dict, speak=None) -> str:
         end   = params.get("end",   "")
         if not _ffmpeg_available():
             return "ffmpeg not found."
-        out = _output_path(path, f"trim", path.suffix)
+        out = _output_path(path, "trim", path.suffix)
         try:
             cmd = ["ffmpeg", "-i", str(path), "-ss", str(start)]
             if end:
@@ -720,7 +721,8 @@ def _process_archive(path: Path, action: str, params: dict, speak=None) -> str:
 
     if action == "list":
         try:
-            import zipfile, tarfile
+            import tarfile
+            import zipfile
             ext = path.suffix.lower()
             if ext == ".zip":
                 with zipfile.ZipFile(path) as z:

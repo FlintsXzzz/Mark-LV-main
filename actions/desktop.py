@@ -1,13 +1,13 @@
 #desktop.py
-import os
-import sys
 import json
+import os
+import platform
 import shutil
 import subprocess
+import sys
 import tempfile
-import platform
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 try:
     import pyautogui
@@ -25,9 +25,9 @@ def _get_base_dir() -> Path:
 
 def _get_api_key() -> str:
     path = _get_base_dir() / "config" / "api_keys.json"
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)["gemini_api_key"]
-    
+
 def _get_desktop() -> Path:
     if _OS == "Linux":
         xdg = os.environ.get("XDG_DESKTOP_DIR", "")

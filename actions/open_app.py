@@ -1,7 +1,7 @@
-import time
-import subprocess
 import platform
 import shutil
+import subprocess
+import time
 
 try:
     import psutil

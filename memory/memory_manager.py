@@ -1,9 +1,9 @@
 import json
 import re
-from datetime import datetime
-from threading import Lock
-from pathlib import Path
 import sys
+from datetime import datetime
+from pathlib import Path
+from threading import Lock
 
 
 def get_base_dir() -> Path:

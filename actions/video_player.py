@@ -233,7 +233,7 @@ def _play_youtube(player, source: str, token: int) -> None:
     themselves."""
     try:
         url, audio_url, title, err = _resolve_youtube(source)
-    except Exception as e:                                  # noqa: BLE001
+    except Exception as e:
         url = audio_url = title = ""
         err = str(e)
 
@@ -245,7 +245,7 @@ def _play_youtube(player, source: str, token: int) -> None:
             player.show_video(url, title or source, muted=True,
                               audio_source=audio_url)
             return
-        except Exception as e:                              # noqa: BLE001
+        except Exception as e:
             err = str(e)
 
     # Resolution failed. Opening it in a browser is worse than playing it in the

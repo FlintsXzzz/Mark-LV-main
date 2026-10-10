@@ -1,12 +1,12 @@
 #youtube_video.py
 import json
 import re
+import shutil
+import subprocess
 import sys
 import time
-import subprocess
-import shutil
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from urllib.parse import quote_plus
 
 try:
@@ -33,7 +33,7 @@ try:
 except ImportError:
     _TRANSCRIPT_OK = False
 
-from config import get_os, is_windows, is_mac, is_linux
+from config import get_os, is_linux, is_mac, is_windows
 
 
 def _get_base_dir() -> Path:
@@ -58,7 +58,7 @@ _YT_VIDEO_FILTER = "EgIQAQ%3D%3D"
 
 
 def _get_api_key() -> str:
-    with open(API_CONFIG_PATH, "r", encoding="utf-8") as f:
+    with open(API_CONFIG_PATH, encoding="utf-8") as f:
         return json.load(f)["gemini_api_key"]
 
 
@@ -168,6 +168,7 @@ def _get_transcript(video_id: str) -> str | None:
 
 def _summarize_with_gemini(transcript: str, video_url: str) -> str:
     from google.genai import types
+
     from core import gemini
 
     max_chars = 80000
@@ -298,7 +299,7 @@ def _handle_play(parameters: dict, player) -> str:
         _open_url(video_url)
         return f"Playing: {query}"
 
-    print(f"[YouTube] ⚠️ Scrape failed, opening filtered search page")
+    print("[YouTube] ⚠️ Scrape failed, opening filtered search page")
     fallback_url = (
         f"https://www.youtube.com/results"
         f"?search_query={quote_plus(query)}"

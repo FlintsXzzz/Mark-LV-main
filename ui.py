@@ -27,15 +27,41 @@ else:
 os.environ.setdefault("QT_LOGGING_RULES", "qt.multimedia.*=false")
 
 from PyQt6.QtCore import (
-    QEasingCurve, QLineF, QMimeData, QObject, QParallelAnimationGroup, QPointF,
-    QPoint, QPropertyAnimation, QRect, QRectF, QSize, QSizeF, Qt, QTimer,
-    QUrl, pyqtSignal,
+    QEasingCurve,
+    QLineF,
+    QMimeData,
+    QObject,
+    QParallelAnimationGroup,
+    QPoint,
+    QPointF,
+    QPropertyAnimation,
+    QRect,
+    QRectF,
+    QSize,
+    QSizeF,
+    Qt,
+    QTimer,
+    QUrl,
+    pyqtSignal,
 )
 from PyQt6.QtGui import (
-    QBrush, QColor, QConicalGradient, QDragEnterEvent, QDropEvent, QFont,
-    QFontDatabase, QKeySequence, QLinearGradient, QPainter, QPainterPath,
-    QPen, QPixmap, QRadialGradient, QShortcut,
+    QBrush,
+    QColor,
+    QConicalGradient,
+    QDragEnterEvent,
+    QDropEvent,
+    QFont,
+    QFontDatabase,
+    QKeySequence,
+    QLinearGradient,
+    QPainter,
+    QPainterPath,
+    QPen,
+    QPixmap,
+    QRadialGradient,
+    QShortcut,
 )
+
 # Video playback for the HUD. Part of PyQt6, so it costs no new dependency —
 # but the multimedia plugins are a separate piece of the Qt install and can be
 # absent on a stripped-down system, so a failure here disables one feature
@@ -44,16 +70,31 @@ try:
     from PyQt6.QtMultimedia import QAudioOutput, QMediaPlayer
     from PyQt6.QtMultimediaWidgets import QGraphicsVideoItem
     HAVE_VIDEO = True
-except Exception as _e:            # noqa: BLE001 - reported, never fatal
+except Exception as _e:
     QAudioOutput = QMediaPlayer = QGraphicsVideoItem = None
     HAVE_VIDEO = False
     print(f"[Video] playback unavailable ({_e}) — the HUD will not show video.")
 
 from PyQt6.QtWidgets import (
-    QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit,
-    QMainWindow, QPushButton, QScrollArea, QSizePolicy, QSplitter,
-    QGraphicsScene, QGraphicsView,
-    QStackedWidget, QTextEdit, QVBoxLayout, QWidget, QProgressBar,
+    QApplication,
+    QComboBox,
+    QFileDialog,
+    QFrame,
+    QGraphicsScene,
+    QGraphicsView,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMainWindow,
+    QProgressBar,
+    QPushButton,
+    QScrollArea,
+    QSizePolicy,
+    QSplitter,
+    QStackedWidget,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
 )
 
 try:
@@ -2057,7 +2098,7 @@ class AudioDeviceOverlay(_HudOverlay):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        from core.audio_devices import list_devices, DEFAULT_LABEL
+        from core.audio_devices import DEFAULT_LABEL, list_devices
         from memory.config_manager import get_input_device, get_output_device
 
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -2158,8 +2199,10 @@ class AudioDeviceOverlay(_HudOverlay):
 
     def _apply(self):
         from memory.config_manager import (
-            get_input_device, get_output_device,
-            save_input_device, save_output_device,
+            get_input_device,
+            get_output_device,
+            save_input_device,
+            save_output_device,
         )
         new_in  = self._in_box.currentData()  or ""
         new_out = self._out_box.currentData() or ""
@@ -2847,8 +2890,9 @@ class RemoteKeyOverlay(QWidget):
             self._qr_label.setText("—")
             return
         try:
-            import qrcode as _qrmod
             from io import BytesIO
+
+            import qrcode as _qrmod
             qr = _qrmod.QRCode(
                 box_size=5, border=2,
                 error_correction=_qrmod.constants.ERROR_CORRECT_M,
@@ -3498,6 +3542,7 @@ class MainWindow(QMainWindow):
         """
         try:
             import math
+
             import PIL.Image
             import PIL.ImageDraw
             import PIL.ImageFilter
@@ -3599,7 +3644,7 @@ class MainWindow(QMainWindow):
         """
         # ── Option 1: pywin32 (pure Python COM, zero subprocess) ──────────
         try:
-            from win32com.client import Dispatch   # type: ignore
+            from win32com.client import Dispatch  # type: ignore
             sh = Dispatch("WScript.Shell")
             sc = sh.CreateShortCut(lnk)
             sc.TargetPath       = target
@@ -4561,7 +4606,7 @@ class MainWindow(QMainWindow):
         for f in (findings or []):
             key, mark = self._REVIEW_MARKS.get(f.get("severity"), ("PRI_DIM", "·"))
             colour = getattr(C, key)
-            parts.append(f'<div style="margin-bottom:11px;">')
+            parts.append('<div style="margin-bottom:11px;">')
             parts.append(
                 f'<span style="color:{colour}; font-weight:bold;">{mark}</span> '
                 f'<span style="color:{C.WHITE}; font-weight:bold;">'
@@ -5174,8 +5219,7 @@ class MainWindow(QMainWindow):
             else "SYS: HUD switched to the reactor core.")
 
     def _toggle_ptt(self):
-        from memory.config_manager import (get_push_to_talk_enabled,
-                                           save_push_to_talk_enabled)
+        from memory.config_manager import get_push_to_talk_enabled, save_push_to_talk_enabled
         want = not get_push_to_talk_enabled()
         save_push_to_talk_enabled(want)
         scope = None
@@ -5199,6 +5243,7 @@ class MainWindow(QMainWindow):
         timer out, which behaves like holding a key.
         """
         from PyQt6.QtGui import QKeySequence, QShortcut
+
         from core.hotkey import qt_sequence
 
         if not needed:

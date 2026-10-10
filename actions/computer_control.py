@@ -11,8 +11,8 @@ if platform.system() == "Windows":
     _WIN_HIDE: dict = {"creationflags": subprocess.CREATE_NO_WINDOW}
 else:
     _WIN_HIDE: dict = {}
-import time
 import random
+import time
 from pathlib import Path
 
 try:

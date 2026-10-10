@@ -1,15 +1,15 @@
+import json
 import os
 import platform
 import re
-import sys
-import json
-import time
 import subprocess
+import sys
 import threading
-from pathlib import Path
+import time
 from datetime import datetime
+from pathlib import Path
 
-from config import get_os, is_windows, is_mac, is_linux
+from config import get_os, is_linux, is_mac, is_windows
 
 _CNW: dict = (
     {"creationflags": subprocess.CREATE_NO_WINDOW}
@@ -196,8 +196,8 @@ def _get_steam_window_rect() -> tuple[int, int, int, int] | None:
 def _click_first_profile_by_screenshot() -> bool:
 
     try:
-        import pyautogui
         import numpy as np
+        import pyautogui
 
         time.sleep(1.5)
         win = _get_steam_window_rect()
@@ -255,7 +255,8 @@ def _handle_steam_profile_selection() -> bool:
 
     wx, wy, ww, wh = win
     try:
-        import pyautogui, numpy as np
+        import numpy as np
+        import pyautogui
         screenshot   = pyautogui.screenshot(region=(wx, wy, ww, wh))
         img          = np.array(screenshot)
         is_small     = ww < 900 and wh < 700
@@ -277,7 +278,8 @@ def _handle_steam_profile_selection() -> bool:
     return _click_first_profile_by_screenshot()
 
 def _find_best_drive() -> dict | None:
-    import shutil, string
+    import shutil
+    import string
     drives = []
     for letter in string.ascii_uppercase:
         drive_path = f"{letter}:\\"
@@ -497,7 +499,8 @@ def _search_steam_appid(game_name: str) -> tuple[str | None, str | None]:
             return app_id, canonical
 
     try:
-        import urllib.request, urllib.parse
+        import urllib.parse
+        import urllib.request
         query = urllib.parse.quote(game_name)
         url   = f"https://store.steampowered.com/api/storesearch/?term={query}&l=english&cc=US"
         req   = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})

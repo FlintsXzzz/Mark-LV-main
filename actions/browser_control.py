@@ -10,15 +10,17 @@ import subprocess
 import threading
 import webbrowser
 from pathlib import Path
-from typing import Optional
 
 from playwright.async_api import (
-    async_playwright,
     BrowserContext,
     Page,
     Playwright,
+    async_playwright,
+)
+from playwright.async_api import (
     TimeoutError as PlaywrightTimeout,
 )
+
 _OS = platform.system()   # "Windows" | "Darwin" | "Linux"
 
 def _normalize_url(url: str) -> str:
@@ -112,7 +114,7 @@ def _real_profile_dir(browser: str) -> str:
     print(f"[Browser] ⚠️  Real profile not found for {browser}, using: {fallback}")
     return str(fallback)
 
-def _firefox_profile_dir() -> Optional[str]:
+def _firefox_profile_dir() -> str | None:
     home = Path.home()
 
     if _OS == "Windows":
@@ -127,7 +129,7 @@ def _firefox_profile_dir() -> Optional[str]:
         return None
 
     current: dict[str, str] = {}
-    default_path: Optional[str] = None
+    default_path: str | None = None
 
     for line in ini.read_text(encoding="utf-8", errors="ignore").splitlines():
         line = line.strip()
@@ -151,7 +153,7 @@ def _firefox_profile_dir() -> Optional[str]:
         return default_path
     return None
 
-def _find_opera_windows() -> Optional[str]:
+def _find_opera_windows() -> str | None:
     local  = os.environ.get("LOCALAPPDATA", "")
     prog   = os.environ.get("PROGRAMFILES", "")
     prog86 = os.environ.get("PROGRAMFILES(X86)", "")
@@ -192,7 +194,7 @@ def _find_opera_windows() -> Optional[str]:
 
     return shutil.which("opera") or None
 
-def _find_exe_windows(prog_name: str) -> Optional[str]:
+def _find_exe_windows(prog_name: str) -> str | None:
     try:
         import winreg
         paths_to_try = [
@@ -276,7 +278,7 @@ def _resolve_browser(name: str) -> dict | None:
     if spec.get("special") == "opera_windows":
         exe = _find_opera_windows()
         if not exe:
-            print(f"[Browser] ⚠️  Opera executable not found on Windows.")
+            print("[Browser] ⚠️  Opera executable not found on Windows.")
         return {"engine": engine, "exe": exe, "channel": channel}
 
     for b in bins:
@@ -367,7 +369,7 @@ _MAC_APP_NAMES: dict[str, str] = {
 _WIN_EXE_HINTS: dict[str, str] = {"chrome": "chrome", "edge": "msedge"}
 
 
-def _open_native(url: str, browser_name: Optional[str]) -> str:
+def _open_native(url: str, browser_name: str | None) -> str:
     """
     Opens the user's REAL browser normally — with their own profile,
     logged-in accounts and extensions. No automation attaches, so an
@@ -553,7 +555,7 @@ class _BrowserSession:
                 self._context = await engine_obj.launch_persistent_context(jarvis, **kwargs)
 
             self._page = await self._adopt_page()
-            print(f"[Browser] ✅ Firefox launched")
+            print("[Browser] ✅ Firefox launched")
             return
 
         if engine_name == "webkit":
@@ -568,7 +570,7 @@ class _BrowserSession:
             }
             self._context = await engine_obj.launch_persistent_context(safari_profile, **kwargs)
             self._page = await self._adopt_page()
-            print(f"[Browser] ✅ Safari launched")
+            print("[Browser] ✅ Safari launched")
             return
 
         profile = _real_profile_dir(self.browser_name)

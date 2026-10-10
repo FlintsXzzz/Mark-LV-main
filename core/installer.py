@@ -10,7 +10,7 @@ import importlib.util
 import platform
 import subprocess
 import sys
-from typing import Callable
+from collections.abc import Callable
 
 # ── Package lists ─────────────────────────────────────────────────────────
 # Each entry: (import_name, pip_package_name)

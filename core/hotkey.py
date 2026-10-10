@@ -32,7 +32,7 @@ from __future__ import annotations
 import platform
 import threading
 import time
-from typing import Callable
+from collections.abc import Callable
 
 _OS = platform.system()
 
@@ -131,7 +131,7 @@ class PushToTalk:
     def _can_poll(self) -> bool:
         try:
             import ctypes
-            ctypes.windll.user32.GetAsyncKeyState  # noqa: B018 — presence check
+            ctypes.windll.user32.GetAsyncKeyState
             return all(k in _VK for k in self._chord)
         except Exception:
             return False

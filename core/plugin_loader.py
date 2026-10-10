@@ -13,11 +13,11 @@ import inspect
 import re
 import sys
 import traceback
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Optional
 
-from memory.config_manager import get_plugin_enabled, get_plugin_config
+from memory.config_manager import get_plugin_config, get_plugin_enabled
 
 _NAME_RE = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]{0,63}$")
 _DEFAULT_PARAMS = {"type": "OBJECT", "properties": {}}
@@ -29,7 +29,7 @@ _BEHAVIORS = ("BLOCKING", "NON_BLOCKING")
 _SCHEDULING = ("WHEN_IDLE", "SILENT", "INTERRUPT")
 
 
-def _opt_upper(value, allowed: tuple[str, ...]) -> Optional[str]:
+def _opt_upper(value, allowed: tuple[str, ...]) -> str | None:
     v = str(value or "").strip().upper()
     return v if v in allowed else None
 
@@ -39,13 +39,13 @@ class PluginRecord:
     name: str
     description: str = ""
     parameters: dict = field(default_factory=lambda: dict(_DEFAULT_PARAMS))
-    run: Optional[Callable] = None
+    run: Callable | None = None
     file: str = ""
     valid: bool = False
     error: str = ""
-    settings: Optional[dict] = None   # optional PLUGIN_SETTINGS schema (config fields)
-    behavior: Optional[str] = None    # None = the API's default (blocking)
-    scheduling: Optional[str] = None  # None = the API's default (WHEN_IDLE)
+    settings: dict | None = None   # optional PLUGIN_SETTINGS schema (config fields)
+    behavior: str | None = None    # None = the API's default (blocking)
+    scheduling: str | None = None  # None = the API's default (WHEN_IDLE)
 
 
 class PluginRegistry:
@@ -78,7 +78,7 @@ class PluginRegistry:
     def has(self, name: str) -> bool:
         return name in self._plugins
 
-    def scheduling(self, name: str) -> Optional[str]:
+    def scheduling(self, name: str) -> str | None:
         """How this plugin's result should re-enter the conversation, if it said."""
         rec = self._plugins.get(name)
         return rec.scheduling if rec else None

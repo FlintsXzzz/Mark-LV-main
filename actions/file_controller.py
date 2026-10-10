@@ -1,8 +1,8 @@
 import os
-import shutil
 import platform
-from pathlib import Path
+import shutil
 from datetime import datetime
+from pathlib import Path
 
 try:
     import send2trash

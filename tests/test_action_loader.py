@@ -9,7 +9,7 @@ import textwrap
 
 import pytest
 
-from core.action_loader import ActionRegistry, discover_actions
+from core.action_loader import discover_actions
 
 
 @pytest.fixture(autouse=True)

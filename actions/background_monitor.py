@@ -9,7 +9,6 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-
 # ── Blocked categories (never monitor regardless of what user says) ────────────
 
 _BLOCKED = {
@@ -43,7 +42,7 @@ def _load() -> dict:
     return data if isinstance(data, dict) else {}
 
 def _save(monitors: dict) -> None:
-    from memory.memory_manager import load_memory, MEMORY_PATH, _lock
+    from memory.memory_manager import MEMORY_PATH, _lock, load_memory
     memory = load_memory()
     memory["monitors"] = monitors
     with _lock:

@@ -30,9 +30,9 @@ import inspect
 import re
 import sys
 import traceback
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Optional
 
 _NAME_RE = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]{0,63}$")
 _DEFAULT_PARAMS = {"type": "OBJECT", "properties": {}}
@@ -49,7 +49,7 @@ _BEHAVIORS = ("BLOCKING", "NON_BLOCKING")
 _SCHEDULING = ("WHEN_IDLE", "SILENT", "INTERRUPT")
 
 
-def _opt_upper(value, allowed: tuple[str, ...]) -> Optional[str]:
+def _opt_upper(value, allowed: tuple[str, ...]) -> str | None:
     v = str(value or "").strip().upper()
     return v if v in allowed else None
 
@@ -59,12 +59,12 @@ class ActionRecord:
     name: str
     description: str = ""
     parameters: dict = field(default_factory=lambda: dict(_DEFAULT_PARAMS))
-    handler: Optional[Callable] = None
+    handler: Callable | None = None
     file: str = ""
     valid: bool = False
     error: str = ""
-    behavior: Optional[str] = None     # None = the API's default (blocking)
-    scheduling: Optional[str] = None   # None = the API's default (WHEN_IDLE)
+    behavior: str | None = None     # None = the API's default (blocking)
+    scheduling: str | None = None   # None = the API's default (WHEN_IDLE)
 
 
 class ActionRegistry:
@@ -87,7 +87,7 @@ class ActionRegistry:
     def has(self, name: str) -> bool:
         return name in self._actions
 
-    def scheduling(self, name: str) -> Optional[str]:
+    def scheduling(self, name: str) -> str | None:
         """How this action's result should re-enter the conversation, if it said."""
         rec = self._actions.get(name)
         return rec.scheduling if rec else None

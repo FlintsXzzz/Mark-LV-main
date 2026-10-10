@@ -1,7 +1,7 @@
-import subprocess
-import sys
 import json
 import re
+import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -22,7 +22,7 @@ from core import gemini
 
 
 def _get_api_key() -> str:
-    with open(API_CONFIG_PATH, "r", encoding="utf-8") as f:
+    with open(API_CONFIG_PATH, encoding="utf-8") as f:
         return json.load(f)["gemini_api_key"]
 
 
@@ -494,7 +494,7 @@ Be specific and actionable. If you see an error message, quote it exactly."""
             return "Sir, I couldn't reach Gemini to analyse that screenshot."
 
         analysis = (response.text or "").strip()
-        print(f"[Code] ✅ Screen analysis complete")
+        print("[Code] ✅ Screen analysis complete")
 
         try:
             screenshot_path.unlink()

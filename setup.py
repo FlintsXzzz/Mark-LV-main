@@ -94,7 +94,7 @@ def main() -> None:
     # ── OS-specific post-install notes ────────────────────────────────────────
     if OS == "Windows":
         try:
-            import win32com.client  # noqa: F401
+            import win32com.client
         except ImportError:
             postinstall = Path(sys.executable).parent / "Scripts" / "pywin32_postinstall.py"
             print(

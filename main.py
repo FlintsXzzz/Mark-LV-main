@@ -35,25 +35,29 @@ for _stream in ("stdout", "stderr"):
 # ─────────────────────────────────────────────────────────────────────────────
 
 import asyncio
+import json
 import re
+import sys
 import threading
 import time
-import json
-import sys
 import traceback
 from datetime import datetime
 from pathlib import Path
 
-import sounddevice as sd
 import numpy as np
+import sounddevice as sd
 from google import genai
 from google.genai import types
-from ui import JarvisUI
-from memory.memory_manager import (
-    load_memory, update_memory, format_memory_for_prompt,
-    save_session_summary, pop_last_session,
-    search_memory, set_trim_notifier,
+
+from actions.background_monitor import (
+    add_monitor,
+    list_monitors,
+    remove_monitor,
 )
+from actions.background_monitor import (
+    check_all as monitor_check_all,
+)
+from actions.proactive import ProactiveEngine
 
 # The file-backed tools (open_app, web_search, browser_control, …) are no longer
 # imported or declared here — they self-describe via a TOOL dict in their own
@@ -61,29 +65,49 @@ from memory.memory_manager import (
 # Only tools that are tied to live-session state stay inline in this file
 # (screen_process, close_camera, save_memory, manage_monitor, shutdown_jarvis,
 # system_status).
-from actions.screen_processor  import _capture_camera, _capture_screen
-from actions.system_monitor    import SystemMonitor, get_system_status
-from actions.proactive         import ProactiveEngine
-from actions.background_monitor import (
-    add_monitor, remove_monitor, list_monitors, check_all as monitor_check_all,
+from actions.screen_processor import _capture_camera, _capture_screen
+from actions.system_monitor import SystemMonitor, get_system_status
+from actions.web_search import _news as _fetch_news_sync
+from core import audio_devices
+from core import confirm as confirm_gate
+from core import gemini as _gemini
+from core import undo as undo_stack
+from core.action_loader import discover_actions
+from core.echo import EchoGuard
+from core.plugin_loader import discover_plugins
+from core.viseme import VisemeStream
+from core.wake_word import (
+    WakeWordDetector,
 )
-from actions.web_search        import _news as _fetch_news_sync
-from memory.config_manager     import (
-    get_brief_enabled, get_media_resolution, get_proactive_audio_enabled,
-    get_push_to_talk_enabled, get_thinking_enabled, get_turn_tuning, get_voice,
-    get_wake_word_enabled, save_wake_word_enabled,    get_input_device, get_output_device,
+from core.wake_word import (
+    install_and_download as wake_install,
 )
-from core                     import gemini as _gemini
-from core.plugin_loader        import discover_plugins
-from core                      import undo as undo_stack
-from core                      import confirm as confirm_gate
-from core                      import audio_devices
-from core.action_loader        import discover_actions
-from core.echo                 import EchoGuard
-from core.viseme               import VisemeStream
-from core.wake_word            import (
-    WakeWordDetector, is_ready as wake_is_ready, install_and_download as wake_install,
+from core.wake_word import (
+    is_ready as wake_is_ready,
 )
+from memory.config_manager import (
+    get_brief_enabled,
+    get_input_device,
+    get_media_resolution,
+    get_output_device,
+    get_proactive_audio_enabled,
+    get_push_to_talk_enabled,
+    get_thinking_enabled,
+    get_turn_tuning,
+    get_voice,
+    get_wake_word_enabled,
+    save_wake_word_enabled,
+)
+from memory.memory_manager import (
+    format_memory_for_prompt,
+    load_memory,
+    pop_last_session,
+    save_session_summary,
+    search_memory,
+    set_trim_notifier,
+    update_memory,
+)
+from ui import JarvisUI
 
 # How long the assistant stays awake with no user speech before it auto-sleeps
 # again (wake-word mode only).
@@ -291,7 +315,7 @@ def _render_prompt(template: str, values: dict) -> str:
 
 
 def _get_api_key() -> str:
-    with open(API_CONFIG_PATH, "r", encoding="utf-8") as f:
+    with open(API_CONFIG_PATH, encoding="utf-8") as f:
         return json.load(f)["gemini_api_key"]
 
 
@@ -1369,7 +1393,7 @@ class JarvisLive:
             # unless you are holding the key.
             if self._ptt_enabled and not self._ptt_held:
                 return
-            
+
             if not self.ui.muted and not self._phone_active:
                 data = indata.tobytes()
                 loop.call_soon_threadsafe(
@@ -1649,7 +1673,7 @@ class JarvisLive:
                         self.audio_in_queue.get(),
                         timeout=0.1
                     )
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     if (
                         self._turn_done_event
                         and self._turn_done_event.is_set()
@@ -1815,7 +1839,7 @@ class JarvisLive:
                     try:
                         await asyncio.wait_for(self._turn_done_event.wait(), timeout=6.0)
                         turn_waited = True
-                    except asyncio.TimeoutError:
+                    except TimeoutError:
                         pass
 
                 # Extra buffer: turn_complete fires when Gemini finishes *generating*
@@ -2003,7 +2027,7 @@ class JarvisLive:
         while True:
             try:
                 chunk = await asyncio.wait_for(q.get(), timeout=1.0)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # No audio for 1 s → phone mic inactive, give PC mic back
                 self._phone_active = False
                 continue
@@ -2047,7 +2071,7 @@ class JarvisLive:
                     self.ui.write_log(f"[Web]: {text}")
                 else:
                     print(f"[Dashboard] Dropped command (no session): {text}")
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
             except Exception as e:
                 print(f"[Dashboard] Command error: {e}")

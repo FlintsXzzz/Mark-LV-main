@@ -6,7 +6,8 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from config import is_windows, is_mac, is_linux
+from config import is_linux, is_mac, is_windows
+
 
 def _get_base_dir() -> Path:
     if getattr(sys, "frozen", False):
@@ -19,7 +20,7 @@ API_CONFIG_PATH = BASE_DIR / "config" / "api_keys.json"
 
 
 def _get_api_key() -> str:
-    with open(API_CONFIG_PATH, "r", encoding="utf-8") as f:
+    with open(API_CONFIG_PATH, encoding="utf-8") as f:
         return json.load(f)["gemini_api_key"]
 
 _MONTH_MAP: dict[str, int] = {
@@ -129,6 +130,7 @@ def _search_flights_browser(
     cabin:       str,
 ) -> tuple[str, str]:
     import time
+
     from actions.browser_control import browser_control
 
     url = _build_google_flights_url(

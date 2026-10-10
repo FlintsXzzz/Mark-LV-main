@@ -11,12 +11,10 @@ import asyncio
 import os
 import queue as _queue
 import threading
-from typing import Callable, Optional
+from collections.abc import Callable
 
 import numpy as np
 import sounddevice as sd
-
-
 
 # USE_TF=0 stops transformers from importing TensorFlow (saves 4-8 s startup).
 # Do NOT set USE_TORCH or USE_JAX explicitly — forcing those values breaks
@@ -151,7 +149,7 @@ def _import_kokoro_pipeline():
     import sys
 
     def _try_import():
-        from kokoro import KPipeline  # noqa: PLC0415
+        from kokoro import KPipeline
         return KPipeline
 
     try:
@@ -254,7 +252,7 @@ class KokoroTTSEngine:
                 except RuntimeError:
                     pass
                 print(
-                    f"[TTS] Kokoro on CPU — for faster speech install CUDA PyTorch:\n"
+                    "[TTS] Kokoro on CPU — for faster speech install CUDA PyTorch:\n"
                     "      pip install torch --index-url https://download.pytorch.org/whl/cu118"
                 )
         except Exception:
@@ -398,8 +396,8 @@ class TTSPlayer:
     def speak(
         self,
         text:     str,
-        on_start: Optional[Callable] = None,
-        on_done:  Optional[Callable] = None,
+        on_start: Callable | None = None,
+        on_done:  Callable | None = None,
     ) -> None:
         """Synthesise and play text. BLOCKING – call from a dedicated thread."""
         try:

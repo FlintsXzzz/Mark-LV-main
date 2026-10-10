@@ -1,5 +1,7 @@
 # config/__init__.py
-import json, os, platform
+import json
+import os
+import platform
 from pathlib import Path
 
 _CONFIG_PATH = Path(__file__).parent / "api_keys.json"
@@ -12,7 +14,7 @@ def _platform_os() -> str:
 
 def get_config() -> dict:
     try:
-        with open(_CONFIG_PATH, "r", encoding="utf-8") as f:
+        with open(_CONFIG_PATH, encoding="utf-8") as f:
             return json.load(f)
     except Exception:
         return {}

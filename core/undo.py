@@ -37,8 +37,8 @@ from __future__ import annotations
 
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable
 
 # How many reversible operations we keep. Ten is roughly "this conversation":
 # far enough back to catch a mistake you noticed a few commands later, short

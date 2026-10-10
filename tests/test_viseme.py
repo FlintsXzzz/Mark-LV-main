@@ -8,9 +8,12 @@ than miming nonsense.
 import pytest
 
 from core.viseme import (
-    VISEMES, VisemeStream, coverage, text_to_visemes, to_latin,
+    VISEMES,
+    VisemeStream,
+    coverage,
+    text_to_visemes,
+    to_latin,
 )
-
 
 # ── Character reduction ─────────────────────────────────────────────────────
 

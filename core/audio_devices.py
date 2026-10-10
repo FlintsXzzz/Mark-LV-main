@@ -262,6 +262,7 @@ def _query() -> dict[str, list[str]]:
     out: dict[str, list[str]] = {"input": [], "output": []}
     try:
         import platform
+
         import sounddevice as sd
 
         devices = list(sd.query_devices())
@@ -363,6 +364,7 @@ def resolve(name: str, kind: str):
 
     try:
         import platform
+
         import sounddevice as sd
 
         devices = list(sd.query_devices())

@@ -74,7 +74,7 @@ API_CONFIG_PATH = BASE_DIR / "config" / "api_keys.json"
 
 
 def _get_api_key() -> str:
-    with open(API_CONFIG_PATH, "r", encoding="utf-8") as f:
+    with open(API_CONFIG_PATH, encoding="utf-8") as f:
         return json.load(f)["gemini_api_key"]
 
 
@@ -206,6 +206,7 @@ def _gemini_headlines(n: int = 5) -> tuple[list[str], str]:
     Returns (headline_list, raw_text_for_display).
     """
     import re
+
     from core import gemini
 
     response = gemini.call(

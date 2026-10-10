@@ -67,8 +67,8 @@ from __future__ import annotations
 import asyncio
 import json
 import sys
-import time
 import threading
+import time
 from pathlib import Path
 
 if getattr(sys, "frozen", False):
@@ -407,7 +407,7 @@ async def _live_turn(parts: list, system: str, key: str, timeout_s: float) -> st
         # the same way and for the same reason.
         try:
             await asyncio.wait_for(drain(), timeout=1.5)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             pass
         return "".join(chunks).strip()
     finally:
@@ -449,7 +449,7 @@ def _live_call(contents, config, timeout_ms: int, key: str):
         try:
             box["text"] = asyncio.run(
                 _live_turn(parts, str(system), key, max(10.0, timeout_ms / 1000.0)))
-        except BaseException as e:                     # noqa: BLE001
+        except BaseException as e:
             box["error"] = e
 
     try:

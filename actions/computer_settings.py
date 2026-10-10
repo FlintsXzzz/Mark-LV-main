@@ -1,10 +1,10 @@
 #computer_settings.py
 import json
+import platform
 import re
+import subprocess
 import sys
 import time
-import subprocess
-import platform
 from pathlib import Path
 
 try:
@@ -39,7 +39,7 @@ def _get_base_dir() -> Path:
 
 def _get_api_key() -> str:
     path = _get_base_dir() / "config" / "api_keys.json"
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)["gemini_api_key"]
 
 def _get_macos_wifi_interface() -> str:
@@ -99,7 +99,8 @@ def volume_get() -> int | None:
     try:
         if _OS == "Windows":
             import math
-            from ctypes import cast, POINTER
+            from ctypes import POINTER, cast
+
             from comtypes import CLSCTX_ALL
             from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
             devices   = AudioUtilities.GetSpeakers()
@@ -164,7 +165,8 @@ def volume_set(value: int):
     if _OS == "Windows":
         try:
             import math
-            from ctypes import cast, POINTER
+            from ctypes import POINTER, cast
+
             from comtypes import CLSCTX_ALL
             from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
             devices   = AudioUtilities.GetSpeakers()
