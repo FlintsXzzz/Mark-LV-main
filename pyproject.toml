@@ -1,0 +1,84 @@
+# ── MARK LV — tooling configuration ───────────────────────────────────────────
+# The app itself ships no wheel; it is run with `python main.py` after
+# `python setup.py`. This file therefore configures the developer tools only
+# (linting and the test suite) rather than declaring package metadata.
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"        # the floor setup.py enforces
+exclude = [".venv", "__pycache__", "dashboard/static"]
+
+[tool.ruff.lint]
+# Selected, not exhaustive. Every rule here is one whose fix is mechanical and
+# safe; the full "ALL" set is deliberately not used because most of what it
+# flags in this codebase is deliberate (see ignores below).
+select = [
+    "F",      # pyflakes — unused imports/variables, undefined names
+    "E", "W", # pycodestyle errors and warnings
+    "I",      # isort — import ordering
+    "UP",     # pyupgrade — modern syntax for the supported Python
+    "B",      # bugbear — common footguns
+    "SIM",    # simplify — readable rewrites
+    "C4",     # comprehensions
+    "PIE",    # misc lints
+    "RUF",    # ruff-specific
+        "ASYNC",  # blocking calls in async context
+    "S",      # bandit — security
+]
+
+ignore = [
+    # ── Deliberate resilience ────────────────────────────────────────────────
+    # The assistant drives the OS and shells out to whatever the user asked
+    # for. A narrow exception must never abort the turn, so these are the
+    # codebase's core pattern rather than sloppiness.
+    "BLE001",   # blind except
+    "S110",     # try-except-pass
+    "S112",     # try-except-continue
+    "SIM105",   # contextlib.suppress — the same intent, spelled out
+
+    # ── Inherent to what this app is ─────────────────────────────────────────
+    # actions/open_app.py exists to launch applications by name, so the path
+    # is a resolved app name and shell=False is deliberate.
+    "S603",     # subprocess-without-shell-equals-true
+    "S607",     # start-process-with-partial-path
+
+    # computer_control.py picks fake first/last names to type with; none of it
+    # is a secret, a token, or a key.
+    "S311",     # non-cryptographic random
+
+    # Plain `assert` is the normal statement in this codebase.
+    "S101",
+
+    # subprocess.run is used across the OS-action modules; check=False is the
+    # intended semantic (a failing `open` should not abort the turn).
+    "PLW1510",  # subprocess-run-without-check
+
+    # ── Formatting ───────────────────────────────────────────────────────────
+    # Left to the formatter; flagging them in the linter only duplicates it.
+    "E501",     # line length
+    "W291",     # trailing whitespace
+    "W292",     # missing newline at end of file
+    "E701",     # multiple statements on one line (colon)
+    "E702",     # multiple statements on one line (semicolon)
+
+    # The HUD is one large module whose top-level definitions are ordered for
+    # readability; imports below them are deliberate.
+    "E402",     # module level import not at top of file
+
+    # The UI is full of box-drawing and typographic characters; flagging the
+    # visually-similar ones is noise in a file that is mostly a glyph table.
+    "RUF001", "RUF002", "RUF003",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests assert on exact user-facing strings and reach into module internals
+# (_pending, _stack) on purpose, to pin behaviour that has no other handle.
+"tests/*" = ["S105", "S106", "SLF001"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["core", "memory", "actions", "plugins", "dashboard", "config"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra --strict-markers"
